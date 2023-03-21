@@ -1,91 +1,72 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from './page.module.css'
+"use client";
+import { useForm } from "react-hook-form";
+import { ZodType, z } from "zod";
+import { Resolver, zodResolver } from "@hookform/resolvers/zod";
 
-const inter = Inter({ subsets: ['latin'] })
+interface Iformprops {
+  firstName: string;
+  lastName: string;
+  age: number;
+  password: string;
+  confirmPassword: string;
+}
 
 export default function Home() {
+  const formSchema: ZodType<Iformprops> = z
+    .object({
+      firstName: z.string().min(3).max(30),
+      lastName: z.string().min(4).max(30),
+      age: z.number().min(18),
+      password: z.string().min(5).max(50),
+      confirmPassword: z.string().min(5).max(50),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "password do not match",
+      path: ["confirmPassword"],
+    });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Iformprops>({
+    resolver: zodResolver(formSchema),
+  });
+
+  function submitData(data: Iformprops) {
+    /* Techniquement si on fait un form c'est dans cette partie qu'on stoque bien dans la base de données */
+    console.log("data retrieved from form", data);
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
+    <main className="items-center justify-center max-w-4xl px-4 mx-auto">
+      <div className="mt-10 text-center underline ">
+        <h1 className="text-4xl ">Test validation with zod w/ Zod library </h1>
+      </div>
+      <div className="p-2 py-36">
+        <form onSubmit={handleSubmit(submitData)} className="form-control">
+          <div className="flex flex-col h-full gap-4 border border-red-200">
+            <label htmlFor="firstname">Firstname : </label>
+            <input type="text" {...register("firstName")} />
+            <label htmlFor="lastname">Lastname :</label>
+            <input type="text" {...register("lastName")} />
+            <label htmlFor="age">Age :</label>
+            <input
+              type="number"
+              {...register("age", { valueAsNumber: true })}
             />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-        <div className={styles.thirteen}>
-          <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+            <label htmlFor="password">Password :</label>
+            <input type="password" {...register("password")} />
+            <label htmlFor="confirmPassword">Confirm Password :</label>
+            <input type="password" {...register("confirmPassword")} />
+            <input
+              className="items-center justify-center h-8 rounded-md mx-96 btn-primary"
+              type="submit"
+              value={"Send"}
+            />
+          </div>
+        </form>
       </div>
     </main>
-  )
+  );
 }
