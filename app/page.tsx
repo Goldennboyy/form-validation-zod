@@ -48,17 +48,25 @@ export default function Home() {
           <div className="flex flex-col h-full gap-4 border border-red-200">
             <label htmlFor="firstname">Firstname : </label>
             <input type="text" {...register("firstName")} />
+            {errors.firstName && <span>{errors.firstName.message}</span>}
             <label htmlFor="lastname">Lastname :</label>
             <input type="text" {...register("lastName")} />
+            {errors.lastName && <span>{errors.lastName.message}</span>}
             <label htmlFor="age">Age :</label>
             <input
               type="number"
               {...register("age", { valueAsNumber: true })}
             />
+            {errors.age && <span>{errors.age.message}</span>}
             <label htmlFor="password">Password :</label>
             <input type="password" {...register("password")} />
+            {errors.password && <span>{errors.password.message}</span>}
             <label htmlFor="confirmPassword">Confirm Password :</label>
             <input type="password" {...register("confirmPassword")} />
+            {errors.confirmPassword && (
+              <span>{errors.confirmPassword.message}</span>
+            )}
+
             <input
               className="items-center justify-center h-8 rounded-md mx-96 btn-primary"
               type="submit"
